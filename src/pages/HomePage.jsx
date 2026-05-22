@@ -569,16 +569,34 @@ function VideoSection() {
   return (
     <section style={{ position: 'relative', overflow: 'hidden', height: '520px' }}>
 
-      {/* Vidéo en background */}
+      {/* Vidéo en background — corrections mobile */}
       <video
-        autoPlay muted loop playsInline
+        autoPlay
+        muted
+        loop
+        playsInline
+        controls={false}
+        disablePictureInPicture
+        disableRemotePlayback
         style={{
           position: 'absolute', inset: 0,
           width: '100%', height: '100%',
           objectFit: 'cover',
+          // Cache le bouton play sur tous les navigateurs
+          pointerEvents: 'none',
         }}>
         <source src="/videos/deploreailes.mp4" type="video/mp4" />
       </video>
+
+      {/* CSS pour cacher les contrôles natifs webkit/iOS */}
+      <style>{`
+        section video::-webkit-media-controls { display:none!important; }
+        section video::-webkit-media-controls-enclosure { display:none!important; }
+        section video::-webkit-media-controls-panel { display:none!important; }
+        section video::-webkit-media-controls-play-button { display:none!important; }
+        section video::-webkit-media-controls-start-playback-button { display:none!important; }
+        section video::-webkit-media-controls-overlay-play-button { display:none!important; }
+      `}</style>
 
       {/* Overlay dégradé */}
       <div style={{
