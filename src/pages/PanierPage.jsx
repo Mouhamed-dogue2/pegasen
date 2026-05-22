@@ -154,7 +154,7 @@ function PanierLateral() {
   const { items, supprimerItem, modifierQuantite, total, viderPanier, genererMessageWhatsApp } = usePanier()
 
   return (
-    <div style={{ background: 'white', borderRadius: '1.5rem', boxShadow: '0 8px 40px rgba(0,0,0,0.1)', border: '1px solid #f0e8d8', position: 'sticky', top: '100px', overflow: 'hidden' }}>
+    <div style={{ background: 'white', borderRadius: '1.5rem', boxShadow: '0 8px 40px rgba(0,0,0,0.1)', border: '1px solid #f0e8d8', position: 'sticky', top: '80px', overflow: 'hidden' }}>
 
       {/* Header */}
       <div style={{ background: `linear-gradient(135deg, ${C.noirChaud}, #2a1500)`, padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -310,7 +310,7 @@ export default function PanierPage() {
 
       {/* Grille principale */}
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '3rem 1.5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 360px', gap: '2rem', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '2rem', alignItems: 'start' }}>
 
           {/* Zones */}
           <div>

@@ -47,13 +47,20 @@ export default function IntroAnimation() {
     }}>
 
       {/* ── Vidéo (desktop si disponible) ── */}
-      <video ref={videoRef} muted playsInline loop={false} controls={false}
+      <video
+        ref={videoRef}
+        muted
+        playsInline
+        loop={false}
+        controls={false}
+        preload="auto"
         webkit-playsinline="true"
         x5-playsinline="true"
         style={{
           position: 'absolute', inset: 0, width: '100%', height: '100%',
           objectFit: 'cover', opacity: videoOk ? 0.55 : 0,
           transition: 'opacity 0.5s', pointerEvents: 'none',
+          WebkitAppearance: 'none',
         }}>
         <source src="/videos/deploreailes.mp4" type="video/mp4" />
       </video>
