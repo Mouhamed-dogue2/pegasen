@@ -2,25 +2,27 @@ import { useEffect, useState, useRef } from 'react'
 
 export default function IntroAnimation() {
   const [phase, setPhase] = useState('start')
-  // phases: start → wings → glow → text → fade → done
   const videoRef = useRef(null)
   const [videoOk, setVideoOk] = useState(false)
 
   useEffect(() => {
-    // Essaie de jouer la vidéo
     const vid = videoRef.current
     if (vid) {
+      // Attributs obligatoires iOS Safari
       vid.muted = true
-      vid.playsInline = true
+      vid.defaultMuted = true
+      vid.setAttribute('muted', '')
       vid.setAttribute('playsinline', '')
       vid.setAttribute('webkit-playsinline', '')
+      vid.setAttribute('x5-playsinline', '')        // Navigateurs Android Tencent
+      vid.setAttribute('x5-video-player-type', 'h5') // WeChat
+      vid.load()
       const p = vid.play()
       if (p !== undefined) {
         p.then(() => setVideoOk(true)).catch(() => setVideoOk(false))
       }
     }
 
-    // Séquence d'animation
     const t1 = setTimeout(() => setPhase('wings'), 200)
     const t2 = setTimeout(() => setPhase('glow'), 900)
     const t3 = setTimeout(() => setPhase('text'), 1300)
@@ -46,6 +48,8 @@ export default function IntroAnimation() {
 
       {/* ── Vidéo (desktop si disponible) ── */}
       <video ref={videoRef} muted playsInline loop={false} controls={false}
+        webkit-playsinline="true"
+        x5-playsinline="true"
         style={{
           position: 'absolute', inset: 0, width: '100%', height: '100%',
           objectFit: 'cover', opacity: videoOk ? 0.55 : 0,

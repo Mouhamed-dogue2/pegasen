@@ -572,9 +572,14 @@ function VideoSection() {
   useEffect(() => {
     const vid = videoRef.current
     if (!vid) return
+    // iOS Safari : tous les attributs nécessaires
     vid.muted = true
+    vid.defaultMuted = true
+    vid.setAttribute('muted', '')
     vid.setAttribute('playsinline', '')
     vid.setAttribute('webkit-playsinline', '')
+    vid.setAttribute('x5-playsinline', '')
+    vid.load()
     const p = vid.play()
     if (p !== undefined) {
       p.then(() => setVideoOk(true)).catch(() => setVideoOk(false))
@@ -586,6 +591,8 @@ function VideoSection() {
 
       {/* Vidéo (desktop) */}
       <video ref={videoRef} muted playsInline loop controls={false}
+        webkit-playsinline="true"
+        x5-playsinline="true"
         style={{
           position: 'absolute', inset: 0, width: '100%', height: '100%',
           objectFit: 'cover', opacity: videoOk ? 1 : 0,
