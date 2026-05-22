@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ArrowRight, MapPin, Star, Users, Shield, Compass, ChevronLeft, ChevronRight, Phone } from 'lucide-react'
 import useScrollReveal from '@/hooks/useScrollReveal'
@@ -566,36 +566,57 @@ function VehiculeSection() {
 
 // ── SECTION VIDÉO ─────────────────────────────────────────
 function VideoSection() {
+  const videoRef = useRef(null)
+  const [videoOk, setVideoOk] = useState(false)
+
+  useEffect(() => {
+    const vid = videoRef.current
+    if (!vid) return
+    vid.muted = true
+    vid.setAttribute('playsinline', '')
+    vid.setAttribute('webkit-playsinline', '')
+    const p = vid.play()
+    if (p !== undefined) {
+      p.then(() => setVideoOk(true)).catch(() => setVideoOk(false))
+    }
+  }, [])
+
   return (
     <section style={{ position: 'relative', overflow: 'hidden', height: '520px' }}>
 
-      {/* Vidéo en background — corrections mobile */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        controls={false}
-        disablePictureInPicture
-        disableRemotePlayback
+      {/* Vidéo (desktop) */}
+      <video ref={videoRef} muted playsInline loop controls={false}
         style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: 'cover',
-          // Cache le bouton play sur tous les navigateurs
-          pointerEvents: 'none',
+          position: 'absolute', inset: 0, width: '100%', height: '100%',
+          objectFit: 'cover', opacity: videoOk ? 1 : 0,
+          transition: 'opacity 0.5s', pointerEvents: 'none',
         }}>
         <source src="/videos/deploreailes.mp4" type="video/mp4" />
       </video>
 
-      {/* CSS pour cacher les contrôles natifs webkit/iOS */}
+      {/* Fallback mobile : logo animé en background */}
+      {!videoOk && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'radial-gradient(ellipse at center, #2a1500 0%, #1C1208 60%, #060300 100%)',
+        }}>
+          {/* Ailes CSS animées */}
+          <div style={{ position: 'absolute', width: '50vw', maxWidth: '380px', height: '65vw', maxHeight: '480px', right: '50%', top: '50%', transform: 'translateY(-50%) translateX(8%)', background: 'radial-gradient(ellipse at right, #1A6B3C, #D4A017 50%, transparent)', borderRadius: '50% 10% 10% 50%', opacity: 0.2, filter: 'blur(3px)', animation: 'wingPulseSection 4s ease-in-out infinite' }} />
+          <div style={{ position: 'absolute', width: '50vw', maxWidth: '380px', height: '65vw', maxHeight: '480px', left: '50%', top: '50%', transform: 'translateY(-50%) translateX(-8%)', background: 'radial-gradient(ellipse at left, #C0392B, #D4A017 50%, transparent)', borderRadius: '10% 50% 50% 10%', opacity: 0.2, filter: 'blur(3px)', animation: 'wingPulseSection 4s ease-in-out infinite reverse' }} />
+          <img src="/images/logo/pegasen-logo.png" alt="" style={{ width: 'min(45vw, 200px)', opacity: 0.12, filter: 'brightness(0) invert(1)', animation: 'logoHoverSection 6s ease-in-out infinite' }} />
+        </div>
+      )}
+
       <style>{`
-        section video::-webkit-media-controls { display:none!important; }
-        section video::-webkit-media-controls-enclosure { display:none!important; }
-        section video::-webkit-media-controls-panel { display:none!important; }
-        section video::-webkit-media-controls-play-button { display:none!important; }
-        section video::-webkit-media-controls-start-playback-button { display:none!important; }
-        section video::-webkit-media-controls-overlay-play-button { display:none!important; }
+        video::-webkit-media-controls,
+        video::-webkit-media-controls-enclosure,
+        video::-webkit-media-controls-panel,
+        video::-webkit-media-controls-play-button,
+        video::-webkit-media-controls-start-playback-button,
+        video::-webkit-media-controls-overlay-play-button { display:none!important; }
+        @keyframes wingPulseSection { 0%,100%{transform:translateY(-50%) translateX(8%) scale(1)} 50%{transform:translateY(-50%) translateX(8%) scale(1.06)} }
+        @keyframes logoHoverSection { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
       `}</style>
 
       {/* Overlay dégradé */}
