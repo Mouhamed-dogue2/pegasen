@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ArrowRight, MapPin, Star, Users, Shield, Compass, ChevronLeft, ChevronRight, Phone } from 'lucide-react'
 import useScrollReveal from '@/hooks/useScrollReveal'
-import LogoBackground from '@/components/ui/LogoBackground'
 
 const C = {
   or: '#D4A017', orClair: '#F0C040',
@@ -40,146 +39,283 @@ const STATS = [
   { valeur: '24h', label: 'Réponse garantie', emoji: '⚡' },
 ]
 
-// ── HERO avec logo animé ───────────────────────────────────
+// ── HERO REDESIGNÉ ────────────────────────────────────────
 function HeroSection() {
   const [current, setCurrent] = useState(0)
   const [fading, setFading] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [textAnim, setTextAnim] = useState(0)
 
   useEffect(() => {
-    setTimeout(() => setLoaded(true), 100)
-    const t = setInterval(() => go((current + 1) % HERO_SLIDES.length), 6000)
+    setTimeout(() => setLoaded(true), 120)
+    const t = setInterval(() => go((current + 1) % HERO_SLIDES.length), 6500)
     return () => clearInterval(t)
   }, [current])
 
+  // Anime les lettres du titre une par une
+  useEffect(() => {
+    const letters = ['B','i','e','n','v','e','n','u','e']
+    let i = 0
+    const t = setInterval(() => {
+      if (i < letters.length) { setTextAnim(i + 1); i++ }
+      else clearInterval(t)
+    }, 80)
+    return () => clearInterval(t)
+  }, [])
+
   function go(next) {
     setFading(true)
-    setTimeout(() => { setCurrent(next); setFading(false) }, 600)
+    setTimeout(() => { setCurrent(next); setFading(false) }, 700)
   }
 
   const s = HERO_SLIDES[current]
 
   return (
-    <section style={{ position: 'relative', height: '100vh', minHeight: '650px', overflow: 'hidden' }}>
+    <section style={{ position: 'relative', height: '100vh', minHeight: '680px', overflow: 'hidden' }}>
 
-      {/* Image de fond */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `url(${s.image})`,
-        backgroundSize: 'cover', backgroundPosition: 'center',
-        opacity: fading ? 0 : 1,
-        transform: fading ? 'scale(1.06)' : 'scale(1)',
-        transition: 'opacity 0.7s ease, transform 0.7s ease',
-      }} />
-
-      {/* Overlays */}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(28,18,8,0.82) 0%, rgba(28,18,8,0.35) 50%, rgba(28,18,8,0.65) 100%)' }} />
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(28,18,8,0.9) 0%, transparent 50%)' }} />
-
-      {/* ── LOGO CHEVAL AILÉ EN BACKGROUND ── */}
-      <LogoBackground opacity={0.09} />
-
-      {/* Bande tricolore gauche */}
-      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '5px', background: `linear-gradient(to bottom, ${C.vert}, ${C.or}, ${C.rouge})`, zIndex: 5 }} />
-
-      {/* Particules décoratives */}
-      {[...Array(6)].map((_, i) => (
+      {/* ── IMAGES DIAPORAMA ── */}
+      {HERO_SLIDES.map((slide, i) => (
         <div key={i} style={{
-          position: 'absolute',
-          width: `${6 + i * 3}px`, height: `${6 + i * 3}px`,
-          borderRadius: '50%',
-          background: i % 2 === 0 ? `rgba(212,160,23,0.4)` : `rgba(26,107,60,0.3)`,
-          left: `${10 + i * 15}%`, top: `${20 + (i % 3) * 20}%`,
-          animation: `float ${5 + i}s ease-in-out ${i * 0.8}s infinite`,
-          zIndex: 3,
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${slide.image})`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+          opacity: i === current ? (fading ? 0 : 1) : 0,
+          transform: i === current ? (fading ? 'scale(1.06)' : 'scale(1)') : 'scale(1.02)',
+          transition: 'opacity 0.8s ease, transform 0.8s ease',
         }} />
       ))}
 
-      {/* Contenu principal */}
-      <div style={{ position: 'relative', zIndex: 10, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
+      {/* ── OVERLAYS MULTICOUCHES ── */}
+      {/* Gradient principal */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(10,6,0,0.88) 0%, rgba(10,6,0,0.45) 55%, rgba(10,6,0,0.65) 100%)' }} />
+      {/* Gradient bas */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,6,0,0.95) 0%, transparent 45%)' }} />
+      {/* Vignette haut */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(10,6,0,0.5) 0%, transparent 25%)' }} />
 
-        {/* Ligne décorative */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem', opacity: loaded ? 1 : 0, transform: loaded ? 'translateY(0)' : 'translateY(20px)', transition: 'all 0.8s ease 0.2s' }}>
-          <div style={{ height: '1px', width: '50px', background: `linear-gradient(to right, transparent, ${C.or})` }} />
-          <span style={{ color: C.orClair, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.35em', fontWeight: 600 }}>Sénégal • Excursions • Découverte</span>
-          <div style={{ height: '1px', width: '50px', background: `linear-gradient(to left, transparent, ${C.or})` }} />
+      {/* ── DÉCORS GÉOMÉTRIQUES ── */}
+      {/* Cercles décoratifs */}
+      <div style={{ position: 'absolute', top: '8%', right: '6%', width: '320px', height: '320px', borderRadius: '50%', border: '1px solid rgba(212,160,23,0.12)', zIndex: 2, animation: 'rotateSlow 30s linear infinite' }} />
+      <div style={{ position: 'absolute', top: '12%', right: '10%', width: '200px', height: '200px', borderRadius: '50%', border: '1px solid rgba(212,160,23,0.18)', zIndex: 2 }} />
+      <div style={{ position: 'absolute', top: '18%', right: '14%', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(212,160,23,0.06)', zIndex: 2, animation: 'float 7s ease-in-out infinite' }} />
+
+      {/* Ligne décorative gauche */}
+      <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: `linear-gradient(to bottom, ${C.vert} 0%, ${C.or} 50%, ${C.rouge} 100%)`, zIndex: 5 }} />
+
+      {/* Losange décoratif droite */}
+      <div style={{ position: 'absolute', bottom: '15%', right: '5%', width: '60px', height: '60px', border: `2px solid rgba(212,160,23,0.3)`, transform: 'rotate(45deg)', zIndex: 2, animation: 'float 8s ease-in-out 1s infinite' }} />
+
+      {/* Petites étoiles */}
+      {[...Array(8)].map((_, i) => (
+        <div key={i} style={{
+          position: 'absolute', zIndex: 2,
+          width: '3px', height: '3px', borderRadius: '50%',
+          background: i % 3 === 0 ? C.or : i % 3 === 1 ? C.vert : 'white',
+          left: `${8 + i * 11}%`, top: `${12 + (i % 4) * 18}%`,
+          opacity: 0.6,
+          animation: `float ${4 + i * 0.7}s ease-in-out ${i * 0.4}s infinite`,
+        }} />
+      ))}
+
+      {/* ── CONTENU PRINCIPAL ── */}
+      <div style={{
+        position: 'relative', zIndex: 10,
+        height: '100%',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center',
+        padding: '0 5vw',
+        maxWidth: '1400px',
+        margin: '0 auto',
+      }}>
+
+        {/* Badge destination actuelle */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '8px',
+          background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          borderRadius: '9999px', padding: '7px 16px',
+          marginBottom: '1.5rem', width: 'fit-content',
+          opacity: loaded ? 1 : 0,
+          transition: 'all 0.7s ease 0.1s',
+        }}>
+          <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: C.or, animation: 'pulse 2s ease-in-out infinite' }} />
+          <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.78rem', fontWeight: 500, letterSpacing: '0.08em' }}>
+            📍 {s.lieu} — {s.sous}
+          </span>
         </div>
 
-        {/* Titre principal */}
-        <h1 style={{
-          fontFamily: '"Playfair Display", serif',
-          fontSize: 'clamp(3rem, 8vw, 6rem)',
-          lineHeight: 1.0,
-          fontWeight: 700,
-          color: 'white',
-          textShadow: '0 4px 40px rgba(0,0,0,0.5)',
-          marginBottom: '0.6rem',
-          opacity: loaded ? 1 : 0,
-          transform: loaded ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'all 0.9s ease 0.35s',
+        {/* Ligne déco */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '12px',
+          marginBottom: '1.25rem',
+          opacity: loaded ? 1 : 0, transition: 'all 0.7s ease 0.25s',
         }}>
-          Bienvenue chez<br />
-          <span style={{ color: C.or, filter: 'drop-shadow(0 0 25px rgba(212,160,23,0.6))' }}>Pégasen</span>
-          <span style={{ color: C.orClair }}>221</span>
-        </h1>
+          <div style={{ height: '1px', width: '40px', background: `linear-gradient(to right, transparent, ${C.or})` }} />
+          <span style={{ color: C.or, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.4em', fontWeight: 600 }}>
+            Sénégal · Excursions · Authenticité
+          </span>
+        </div>
 
+        {/* TITRE PRINCIPAL */}
+        <div style={{
+          opacity: loaded ? 1 : 0,
+          transform: loaded ? 'translateY(0)' : 'translateY(40px)',
+          transition: 'all 1s ease 0.35s',
+          marginBottom: '1.25rem',
+        }}>
+          <p style={{
+            fontFamily: '"Cormorant Garamond", serif',
+            fontStyle: 'italic', fontWeight: 400,
+            fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+            color: 'rgba(255,255,255,0.7)',
+            margin: '0 0 0.2rem',
+            letterSpacing: '0.05em',
+          }}>
+            Bienvenue chez
+          </p>
+          <h1 style={{
+            fontFamily: '"Playfair Display", serif',
+            fontSize: 'clamp(3.5rem, 9vw, 7.5rem)',
+            lineHeight: 0.92,
+            fontWeight: 900,
+            margin: '0 0 0.3rem',
+            letterSpacing: '-0.02em',
+          }}>
+            <span style={{
+              color: 'white',
+              textShadow: '0 2px 0 rgba(0,0,0,0.3)',
+              WebkitTextStroke: '1px rgba(255,255,255,0.1)',
+            }}>Péga</span>
+            <span style={{
+              color: C.or,
+              filter: 'drop-shadow(0 0 30px rgba(212,160,23,0.7))',
+              WebkitTextStroke: '0px',
+            }}>sen</span>
+            <span style={{
+              color: C.orClair,
+              fontSize: '0.75em',
+              filter: 'drop-shadow(0 0 20px rgba(240,192,64,0.5))',
+            }}>221</span>
+          </h1>
+          {/* Ligne sous le titre */}
+          <div style={{
+            height: '3px',
+            width: loaded ? 'min(400px, 80%)' : '0px',
+            background: `linear-gradient(to right, ${C.or}, ${C.vert}, transparent)`,
+            borderRadius: '9999px',
+            transition: 'width 1.2s ease 0.8s',
+            marginTop: '0.6rem',
+          }} />
+        </div>
+
+        {/* Sous-titre */}
         <p style={{
           fontFamily: '"Cormorant Garamond", serif',
-          fontSize: 'clamp(1.2rem, 3vw, 1.7rem)',
           fontStyle: 'italic',
-          color: 'rgba(255,255,255,0.88)',
-          marginBottom: '0.6rem',
+          fontSize: 'clamp(1.15rem, 2.8vw, 1.55rem)',
+          color: 'rgba(255,255,255,0.82)',
+          marginBottom: '3rem',
+          maxWidth: '560px',
+          lineHeight: 1.5,
           opacity: loaded ? 1 : 0,
-          transition: 'all 0.9s ease 0.5s',
+          transition: 'all 0.9s ease 0.6s',
         }}>
           où vos vacances de rêve deviennent réalité.
         </p>
 
-        <p style={{ color: C.orClair, fontSize: '0.88rem', marginBottom: '2.8rem', letterSpacing: '0.05em', opacity: loaded ? 0.85 : 0, transition: 'all 0.9s ease 0.65s' }}>
-          📍 {s.lieu} — {s.sous}
-        </p>
-
         {/* 2 CHOIX CLIENTS */}
         <div style={{
-          display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', marginBottom: '3rem',
-          opacity: loaded ? 1 : 0, transform: loaded ? 'translateY(0)' : 'translateY(20px)', transition: 'all 0.9s ease 0.75s',
+          display: 'flex', flexWrap: 'wrap', gap: '1rem',
+          marginBottom: '4rem',
+          opacity: loaded ? 1 : 0,
+          transform: loaded ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'all 0.9s ease 0.8s',
         }}>
-          <Link to="/destinations"
-            style={{ display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(14px)', border: '1px solid rgba(255,255,255,0.35)', color: 'white', padding: '16px 26px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.35s', minWidth: '270px' }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.22)'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(0,0,0,0.3)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
-            <span style={{ fontSize: '2rem' }}>👍</span>
-            <div style={{ textAlign: 'left' }}>
-              <p style={{ fontWeight: 700, fontSize: '0.95rem', margin: 0 }}>Je connais le Sénégal</p>
-              <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.8rem', margin: 0 }}>Je compose mon propre circuit</p>
+          <Link to="/mon-circuit"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '14px',
+              background: 'rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.28)',
+              color: 'white', padding: '16px 26px',
+              borderRadius: '16px', textDecoration: 'none',
+              transition: 'all 0.35s',
+              minWidth: '260px',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'; e.currentTarget.style.boxShadow = '0 16px 40px rgba(0,0,0,0.3)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.28)'; e.currentTarget.style.boxShadow = 'none' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>👍</div>
+            <div style={{ textAlign: 'left', flex: 1 }}>
+              <p style={{ fontWeight: 700, fontSize: '0.95rem', margin: '0 0 2px' }}>Je connais le Sénégal</p>
+              <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.78rem', margin: 0 }}>Je compose mon propre circuit</p>
             </div>
-            <ArrowRight size={18} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+            <ArrowRight size={17} style={{ opacity: 0.6, flexShrink: 0 }} />
           </Link>
 
           <a href="https://wa.me/+221788938254" target="_blank" rel="noopener noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '14px', background: `rgba(212,160,23,0.88)`, backdropFilter: 'blur(14px)', border: `1px solid ${C.or}`, color: 'white', padding: '16px 26px', borderRadius: '20px', textDecoration: 'none', transition: 'all 0.35s', minWidth: '270px' }}
-            onMouseEnter={e => { e.currentTarget.style.background = C.or; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 16px 40px rgba(212,160,23,0.5)` }}
-            onMouseLeave={e => { e.currentTarget.style.background = `rgba(212,160,23,0.88)`; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
-            <span style={{ fontSize: '2rem' }}>😀</span>
-            <div style={{ textAlign: 'left' }}>
-              <p style={{ fontWeight: 700, fontSize: '0.95rem', margin: 0 }}>Je m'en remets à vous</p>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', margin: 0 }}>Formulaire personnalisé → WhatsApp</p>
+            style={{
+              display: 'flex', alignItems: 'center', gap: '14px',
+              background: `linear-gradient(135deg, rgba(212,160,23,0.82), rgba(180,130,15,0.9))`,
+              backdropFilter: 'blur(16px)',
+              border: `1px solid rgba(212,160,23,0.5)`,
+              color: 'white', padding: '16px 26px',
+              borderRadius: '16px', textDecoration: 'none',
+              transition: 'all 0.35s',
+              minWidth: '260px',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = `linear-gradient(135deg, ${C.or}, #c4920f)`; e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 16px 40px rgba(212,160,23,0.45)` }}
+            onMouseLeave={e => { e.currentTarget.style.background = `linear-gradient(135deg, rgba(212,160,23,0.82), rgba(180,130,15,0.9))`; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>😀</div>
+            <div style={{ textAlign: 'left', flex: 1 }}>
+              <p style={{ fontWeight: 700, fontSize: '0.95rem', margin: '0 0 2px' }}>Je m'en remets à vous</p>
+              <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.78rem', margin: 0 }}>Formulaire → WhatsApp</p>
             </div>
-            <ArrowRight size={18} style={{ marginLeft: 'auto' }} />
+            <ArrowRight size={17} style={{ flexShrink: 0 }} />
           </a>
         </div>
 
-        <a href="#destinations" style={{ color: 'rgba(255,255,255,0.5)', animation: 'bounce-soft 2.5s ease-in-out infinite' }}>
-          <ChevronDown size={34} />
+        {/* Scroll indicator */}
+        <a href="#destinations" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '6px', textDecoration: 'none', width: 'fit-content' }}>
+          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.2em' }}>Défiler</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            {[0,1,2].map(i => (
+              <div key={i} style={{ height: '1px', background: C.or, borderRadius: '9999px', opacity: 1 - i * 0.3, width: `${28 - i * 6}px`, animation: `fadeIn 1s ease ${i * 0.2}s infinite alternate` }} />
+            ))}
+          </div>
         </a>
       </div>
 
-      {/* Contrôles diaporama */}
-      {[{ side: 'left', fn: () => go((current - 1 + HERO_SLIDES.length) % HERO_SLIDES.length), icon: <ChevronLeft size={22} /> },
-        { side: 'right', fn: () => go((current + 1) % HERO_SLIDES.length), icon: <ChevronRight size={22} /> }].map(({ side, fn, icon }) => (
-        <button key={side} onClick={fn} style={{ position: 'absolute', [side]: '1.25rem', top: '50%', transform: 'translateY(-50%)', zIndex: 10, width: '46px', height: '46px', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', cursor: 'pointer', transition: 'all 0.25s' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.25)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)' }}>
+      {/* ── SLIDE INFO DROITE ── */}
+      <div style={{ position: 'absolute', bottom: '3rem', right: '2rem', zIndex: 10, textAlign: 'right' }}>
+        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.15em', margin: '0 0 2px' }}>Destination</p>
+        <p style={{ color: C.orClair, fontWeight: 700, fontSize: '0.95rem', margin: 0, fontFamily: '"Playfair Display", serif' }}>{s.titre}</p>
+        {/* Compteur slides */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', marginTop: '8px' }}>
+          <span style={{ color: C.or, fontWeight: 700, fontSize: '1rem', fontFamily: '"Playfair Display", serif' }}>
+            {String(current + 1).padStart(2, '0')}
+          </span>
+          <div style={{ height: '1px', width: '24px', background: 'rgba(255,255,255,0.3)' }} />
+          <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.85rem' }}>
+            {String(HERO_SLIDES.length).padStart(2, '0')}
+          </span>
+        </div>
+      </div>
+
+      {/* ── CONTRÔLES DIAPORAMA ── */}
+      {[
+        { side: 'left', fn: () => go((current - 1 + HERO_SLIDES.length) % HERO_SLIDES.length), icon: <ChevronLeft size={20} /> },
+        { side: 'right', fn: () => go((current + 1) % HERO_SLIDES.length), icon: <ChevronRight size={20} /> },
+      ].map(({ side, fn, icon }) => (
+        <button key={side} onClick={fn} style={{
+          position: 'absolute', [side]: '1.5rem', top: '50%', transform: 'translateY(-50%)',
+          zIndex: 10, width: '44px', height: '44px',
+          background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.2)', borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'white', cursor: 'pointer', transition: 'all 0.25s',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = C.or; e.currentTarget.style.borderColor = C.or; e.currentTarget.style.transform = 'translateY(-50%) scale(1.12)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)' }}>
           {icon}
         </button>
       ))}
@@ -302,7 +438,7 @@ function ExcursionsSection() {
 function VehiculeSection() {
   const caracteristiques = [
     {
-      // Kia Carnival / minivan confortable
+      // Minibus 11 places
       image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=600&q=85',
       titre: '11 places climatisées',
       desc: 'Kia Carnival spacieux, sièges confortables, climatisation puissante pour tous.',
@@ -428,6 +564,106 @@ function VehiculeSection() {
   )
 }
 
+// ── SECTION VIDÉO ─────────────────────────────────────────
+function VideoSection() {
+  return (
+    <section style={{ position: 'relative', overflow: 'hidden', height: '520px' }}>
+
+      {/* Vidéo en background */}
+      <video
+        autoPlay muted loop playsInline
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover',
+        }}>
+        <source src="/videos/deploreailes.mp4" type="video/mp4" />
+      </video>
+
+      {/* Overlay dégradé */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(135deg, rgba(28,18,8,0.82) 0%, rgba(26,107,60,0.45) 50%, rgba(28,18,8,0.82) 100%)',
+      }} />
+
+      {/* Bande tricolore haut */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(to right, #1A6B3C, #D4A017, #C0392B)' }} />
+      {/* Bande tricolore bas */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(to right, #C0392B, #D4A017, #1A6B3C)' }} />
+
+      {/* Contenu centré */}
+      <div className="reveal" style={{
+        position: 'relative', zIndex: 10,
+        height: '100%',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        textAlign: 'center', padding: '0 1.5rem',
+      }}>
+        {/* Logo animé par-dessus */}
+        <img
+          src="/images/logo/pegasen-logo.png"
+          alt="PEGASEN221"
+          style={{
+            width: 'min(35vw, 160px)',
+            height: 'auto',
+            marginBottom: '1.5rem',
+            filter: 'drop-shadow(0 0 25px rgba(212,160,23,0.85))',
+            animation: 'float 5s ease-in-out infinite',
+          }}
+        />
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+          <div style={{ height: '1px', width: '50px', background: 'linear-gradient(to right, transparent, #D4A017)' }} />
+          <span style={{ color: '#F0C040', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.3em', fontWeight: 600 }}>
+            L'esprit PEGASEN221
+          </span>
+          <div style={{ height: '1px', width: '50px', background: 'linear-gradient(to left, transparent, #D4A017)' }} />
+        </div>
+
+        <h2 style={{
+          fontFamily: '"Playfair Display", serif',
+          fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+          color: 'white', lineHeight: 1.1,
+          marginBottom: '1rem',
+          textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+        }}>
+          Le Sénégal s'ouvre<br />
+          <span style={{ color: '#D4A017' }}>devant vous</span>
+        </h2>
+
+        <p style={{
+          fontFamily: '"Cormorant Garamond", serif',
+          fontStyle: 'italic',
+          fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+          color: 'rgba(255,255,255,0.82)',
+          maxWidth: '520px',
+          marginBottom: '2rem',
+          lineHeight: 1.6,
+        }}>
+          Comme le cheval ailé déploie ses ailes, laissez-vous porter vers des horizons nouveaux.
+        </p>
+
+        <a href="https://wa.me/+221788938254" target="_blank" rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            background: 'rgba(212,160,23,0.9)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(212,160,23,0.6)',
+            color: 'white', fontWeight: 700,
+            padding: '14px 32px', borderRadius: '9999px',
+            textDecoration: 'none', fontSize: '1rem',
+            transition: 'all 0.3s',
+            boxShadow: '0 4px 20px rgba(212,160,23,0.4)',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#D4A017'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(212,160,23,0.6)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(212,160,23,0.9)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(212,160,23,0.4)' }}>
+          ✈️ Planifier mon voyage
+        </a>
+      </div>
+    </section>
+  )
+}
+
 // ── POURQUOI NOUS ─────────────────────────────────────────
 function PourquoiNousSection() {
   const raisons = [
@@ -506,6 +742,7 @@ export default function HomePage() {
       <DestinationsSection />
       <ExcursionsSection />
       <VehiculeSection />
+      <VideoSection />
       <PourquoiNousSection />
       <CtaSection />
     </>
