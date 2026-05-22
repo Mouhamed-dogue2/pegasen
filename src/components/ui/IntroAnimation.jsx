@@ -1,26 +1,28 @@
 import { useEffect, useState, useRef } from 'react'
 
+// Détecte iOS (iPhone/iPad)
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+}
+
 export default function IntroAnimation() {
   const [phase, setPhase] = useState('start')
   const videoRef = useRef(null)
   const [videoOk, setVideoOk] = useState(false)
+  const ios = isIOS()
 
   useEffect(() => {
     const vid = videoRef.current
-    if (vid) {
-      // Attributs obligatoires iOS Safari
+    if (vid && !ios) {
       vid.muted = true
       vid.defaultMuted = true
       vid.setAttribute('muted', '')
       vid.setAttribute('playsinline', '')
       vid.setAttribute('webkit-playsinline', '')
-      vid.setAttribute('x5-playsinline', '')        // Navigateurs Android Tencent
-      vid.setAttribute('x5-video-player-type', 'h5') // WeChat
       vid.load()
-      const p = vid.play()
-      if (p !== undefined) {
-        p.then(() => setVideoOk(true)).catch(() => setVideoOk(false))
-      }
+      vid.play()
+        .then(() => setVideoOk(true))
+        .catch(() => setVideoOk(false))
     }
 
     const t1 = setTimeout(() => setPhase('wings'), 200)
@@ -46,24 +48,34 @@ export default function IntroAnimation() {
       overflow: 'hidden',
     }}>
 
-      {/* ── Vidéo (desktop si disponible) ── */}
-      <video
-        ref={videoRef}
-        muted
-        playsInline
-        loop={false}
-        controls={false}
-        preload="auto"
-        webkit-playsinline="true"
-        x5-playsinline="true"
-        style={{
-          position: 'absolute', inset: 0, width: '100%', height: '100%',
-          objectFit: 'cover', opacity: videoOk ? 0.55 : 0,
-          transition: 'opacity 0.5s', pointerEvents: 'none',
-          WebkitAppearance: 'none',
-        }}>
-        <source src="/videos/deploreailes.mp4" type="video/mp4" />
-      </video>
+      {/* ── Vidéo (Android + Desktop) ou Image (iOS) ── */}
+      {ios ? (
+        // iOS : image du logo en background à la place de la vidéo
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url(/images/logo/pegasen-logo.png)',
+          backgroundSize: '65%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.12,
+          filter: 'brightness(0) invert(1)',
+        }} />
+      ) : (
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          loop={false}
+          controls={false}
+          preload="auto"
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover', opacity: videoOk ? 0.55 : 0,
+            transition: 'opacity 0.5s', pointerEvents: 'none',
+          }}>
+          <source src="/videos/deploreailes.mp4" type="video/mp4" />
+        </video>
+      )}
 
       {/* Overlay sur la vidéo */}
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(6,3,0,0.92) 0%, rgba(6,3,0,0.5) 50%, rgba(6,3,0,0.65) 100%)', pointerEvents: 'none' }} />

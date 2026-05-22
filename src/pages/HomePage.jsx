@@ -568,63 +568,53 @@ function VehiculeSection() {
 function VideoSection() {
   const videoRef = useRef(null)
   const [videoOk, setVideoOk] = useState(false)
+  const ios = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 
   useEffect(() => {
+    if (ios) return // Sur iOS, on utilise le fallback image directement
     const vid = videoRef.current
     if (!vid) return
-    // iOS Safari : tous les attributs nécessaires
     vid.muted = true
     vid.defaultMuted = true
     vid.setAttribute('muted', '')
     vid.setAttribute('playsinline', '')
-    vid.setAttribute('webkit-playsinline', '')
-    vid.setAttribute('x5-playsinline', '')
     vid.load()
-    const p = vid.play()
-    if (p !== undefined) {
-      p.then(() => setVideoOk(true)).catch(() => setVideoOk(false))
-    }
+    vid.play()
+      .then(() => setVideoOk(true))
+      .catch(() => setVideoOk(false))
   }, [])
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden', height: '520px' }}>
 
-      {/* Vidéo (desktop) */}
-      <video ref={videoRef} muted playsInline loop controls={false}
-        webkit-playsinline="true"
-        x5-playsinline="true"
-        style={{
-          position: 'absolute', inset: 0, width: '100%', height: '100%',
-          objectFit: 'cover', opacity: videoOk ? 1 : 0,
-          transition: 'opacity 0.5s', pointerEvents: 'none',
-        }}>
-        <source src="/videos/deploreailes.mp4" type="video/mp4" />
-      </video>
+      {/* Vidéo (Android + Desktop) */}
+      {!ios && (
+        <video ref={videoRef} muted playsInline loop controls={false}
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover', opacity: videoOk ? 1 : 0,
+            transition: 'opacity 0.5s', pointerEvents: 'none',
+          }}>
+          <source src="/videos/deploreailes.mp4" type="video/mp4" />
+        </video>
+      )}
 
-      {/* Fallback mobile : logo animé en background */}
-      {!videoOk && (
+      {/* Fallback iOS + si vidéo échoue : image du logo + ailes CSS */}
+      {(ios || !videoOk) && (
         <div style={{
           position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'radial-gradient(ellipse at center, #2a1500 0%, #1C1208 60%, #060300 100%)',
         }}>
           {/* Ailes CSS animées */}
-          <div style={{ position: 'absolute', width: '50vw', maxWidth: '380px', height: '65vw', maxHeight: '480px', right: '50%', top: '50%', transform: 'translateY(-50%) translateX(8%)', background: 'radial-gradient(ellipse at right, #1A6B3C, #D4A017 50%, transparent)', borderRadius: '50% 10% 10% 50%', opacity: 0.2, filter: 'blur(3px)', animation: 'wingPulseSection 4s ease-in-out infinite' }} />
-          <div style={{ position: 'absolute', width: '50vw', maxWidth: '380px', height: '65vw', maxHeight: '480px', left: '50%', top: '50%', transform: 'translateY(-50%) translateX(-8%)', background: 'radial-gradient(ellipse at left, #C0392B, #D4A017 50%, transparent)', borderRadius: '10% 50% 50% 10%', opacity: 0.2, filter: 'blur(3px)', animation: 'wingPulseSection 4s ease-in-out infinite reverse' }} />
-          <img src="/images/logo/pegasen-logo.png" alt="" style={{ width: 'min(45vw, 200px)', opacity: 0.12, filter: 'brightness(0) invert(1)', animation: 'logoHoverSection 6s ease-in-out infinite' }} />
+          <div style={{ position: 'absolute', width: '60vw', maxWidth: '400px', height: '70vw', maxHeight: '480px', right: '50%', top: '50%', transform: 'translateY(-50%) translateX(8%)', background: 'radial-gradient(ellipse at right, #1A6B3C, #D4A017 50%, transparent)', borderRadius: '50% 10% 10% 50%', opacity: 0.25, filter: 'blur(2px)', animation: 'wingAnim 5s ease-in-out infinite' }} />
+          <div style={{ position: 'absolute', width: '60vw', maxWidth: '400px', height: '70vw', maxHeight: '480px', left: '50%', top: '50%', transform: 'translateY(-50%) translateX(-8%)', background: 'radial-gradient(ellipse at left, #C0392B, #D4A017 50%, transparent)', borderRadius: '10% 50% 50% 10%', opacity: 0.25, filter: 'blur(2px)', animation: 'wingAnim 5s ease-in-out infinite reverse' }} />
+          <img src="/images/logo/pegasen-logo.png" alt="" aria-hidden style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'min(50vw, 200px)', opacity: 0.1, filter: 'brightness(0) invert(1)', animation: 'logoAnim 6s ease-in-out infinite' }} />
+          <style>{`
+            @keyframes wingAnim { 0%,100%{transform:translateY(-50%) translateX(8%) scale(1)} 50%{transform:translateY(-50%) translateX(8%) scale(1.06)} }
+            @keyframes logoAnim { 0%,100%{transform:translate(-50%,-50%) translateY(0)} 50%{transform:translate(-50%,-50%) translateY(-12px)} }
+          `}</style>
         </div>
       )}
-
-      <style>{`
-        video::-webkit-media-controls,
-        video::-webkit-media-controls-enclosure,
-        video::-webkit-media-controls-panel,
-        video::-webkit-media-controls-play-button,
-        video::-webkit-media-controls-start-playback-button,
-        video::-webkit-media-controls-overlay-play-button { display:none!important; }
-        @keyframes wingPulseSection { 0%,100%{transform:translateY(-50%) translateX(8%) scale(1)} 50%{transform:translateY(-50%) translateX(8%) scale(1.06)} }
-        @keyframes logoHoverSection { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-      `}</style>
 
       {/* Overlay dégradé */}
       <div style={{
