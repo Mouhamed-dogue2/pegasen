@@ -252,7 +252,7 @@ function HeroSection() {
             <ArrowRight size={17} style={{ opacity: 0.6, flexShrink: 0 }} />
           </Link>
 
-          <a href="https://wa.me/+221788938254" target="_blank" rel="noopener noreferrer"
+          <Link to="/remets-a-vous"
             style={{
               display: 'flex', alignItems: 'center', gap: '14px',
               background: `linear-gradient(135deg, rgba(212,160,23,0.82), rgba(180,130,15,0.9))`,
@@ -271,7 +271,7 @@ function HeroSection() {
               <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.78rem', margin: 0 }}>Formulaire → WhatsApp</p>
             </div>
             <ArrowRight size={17} style={{ flexShrink: 0 }} />
-          </a>
+          </Link>
         </div>
 
         {/* Scroll indicator */}

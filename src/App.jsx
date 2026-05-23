@@ -11,6 +11,7 @@ import SolidaritePage from '@/pages/SolidaritePage'
 import VlogPage from '@/pages/VlogPage'
 import ContactPage from '@/pages/ContactPage'
 import PanierPage from '@/pages/PanierPage'
+import RemetsAVousPage from '@/pages/RemetsAVousPage'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import PanierWidget from '@/components/ui/PanierWidget'
 import IntroAnimation from '@/components/ui/IntroAnimation'
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/vlog" element={<VlogPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/mon-circuit" element={<PanierPage />} />
+            <Route path="/remets-a-vous" element={<RemetsAVousPage />} />
           </Route>
         </Routes>
         <WhatsAppButton />
