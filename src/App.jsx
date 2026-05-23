@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Layout from '@/components/layout/Layout'
 import HomePage from '@/pages/HomePage'
 import DestinationsPage from '@/pages/DestinationsPage'
@@ -17,20 +17,19 @@ import IntroAnimation from '@/components/ui/IntroAnimation'
 import { PanierProvider } from '@/context/PanierContext'
 
 export default function App() {
+  // L'IntroAnimation gère elle-même sa disparition via onDone
   const [showIntro, setShowIntro] = useState(true)
-
-  useEffect(() => {
-    const t = setTimeout(() => setShowIntro(false), 3700)
-    return () => clearTimeout(t)
-  }, [])
 
   return (
     <BrowserRouter>
       <PanierProvider>
-        {showIntro && <IntroAnimation />}
+        {/* L'intro se retire elle-même quand elle appelle onDone */}
+        {showIntro && <IntroAnimation onDone={() => setShowIntro(false)} />}
+
         <Toaster position="top-right" toastOptions={{
           style: { background: '#FDF3E3', color: '#1C1208', border: '1px solid rgba(212,160,23,0.3)', fontFamily: '"DM Sans", sans-serif', fontSize: '0.9rem' }
         }} />
+
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
@@ -44,7 +43,6 @@ export default function App() {
             <Route path="/mon-circuit" element={<PanierPage />} />
           </Route>
         </Routes>
-        {/* Boutons flottants */}
         <WhatsAppButton />
         <PanierWidget />
       </PanierProvider>
