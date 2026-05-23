@@ -566,136 +566,65 @@ function VehiculeSection() {
 
 // ── SECTION VIDÉO ─────────────────────────────────────────
 function VideoSection() {
-  const videoRef = useRef(null)
-  const [videoOk, setVideoOk] = useState(false)
-  const ios = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
-
-  useEffect(() => {
-    if (ios) return // Sur iOS, on utilise le fallback image directement
-    const vid = videoRef.current
-    if (!vid) return
-    vid.muted = true
-    vid.defaultMuted = true
-    vid.setAttribute('muted', '')
-    vid.setAttribute('playsinline', '')
-    vid.load()
-    vid.play()
-      .then(() => setVideoOk(true))
-      .catch(() => setVideoOk(false))
-  }, [])
+  const ios = typeof navigator !== 'undefined' &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
 
   return (
-    <section style={{ position: 'relative', overflow: 'hidden', height: '520px' }}>
+    <section style={{ position: 'relative', overflow: 'hidden', height: 'clamp(400px, 60vw, 520px)' }}>
 
-      {/* Vidéo (Android + Desktop) */}
+      {/* Fond de base toujours visible */}
+      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, #2a1500 0%, #1C1208 60%, #060300 100%)' }} />
+
+      {/* iOS → GIF animé */}
+      {ios && (
+        <img src="/videos/deploreailes.gif" alt="" aria-hidden
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7, pointerEvents: 'none' }} />
+      )}
+
+      {/* Android + PC → vidéo MP4 */}
       {!ios && (
-        <video ref={videoRef} muted playsInline loop controls={false}
-          style={{
-            position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover', opacity: videoOk ? 1 : 0,
-            transition: 'opacity 0.5s', pointerEvents: 'none',
-          }}>
+        <video autoPlay muted loop playsInline controls={false}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}>
           <source src="/videos/deploreailes.mp4" type="video/mp4" />
         </video>
       )}
 
-      {/* Fallback iOS + si vidéo échoue : image du logo + ailes CSS */}
-      {(ios || !videoOk) && (
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'radial-gradient(ellipse at center, #2a1500 0%, #1C1208 60%, #060300 100%)',
-        }}>
-          {/* Ailes CSS animées */}
-          <div style={{ position: 'absolute', width: '60vw', maxWidth: '400px', height: '70vw', maxHeight: '480px', right: '50%', top: '50%', transform: 'translateY(-50%) translateX(8%)', background: 'radial-gradient(ellipse at right, #1A6B3C, #D4A017 50%, transparent)', borderRadius: '50% 10% 10% 50%', opacity: 0.25, filter: 'blur(2px)', animation: 'wingAnim 5s ease-in-out infinite' }} />
-          <div style={{ position: 'absolute', width: '60vw', maxWidth: '400px', height: '70vw', maxHeight: '480px', left: '50%', top: '50%', transform: 'translateY(-50%) translateX(-8%)', background: 'radial-gradient(ellipse at left, #C0392B, #D4A017 50%, transparent)', borderRadius: '10% 50% 50% 10%', opacity: 0.25, filter: 'blur(2px)', animation: 'wingAnim 5s ease-in-out infinite reverse' }} />
-          <img src="/images/logo/pegasen-logo.png" alt="" aria-hidden style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 'min(50vw, 200px)', opacity: 0.1, filter: 'brightness(0) invert(1)', animation: 'logoAnim 6s ease-in-out infinite' }} />
-          <style>{`
-            @keyframes wingAnim { 0%,100%{transform:translateY(-50%) translateX(8%) scale(1)} 50%{transform:translateY(-50%) translateX(8%) scale(1.06)} }
-            @keyframes logoAnim { 0%,100%{transform:translate(-50%,-50%) translateY(0)} 50%{transform:translate(-50%,-50%) translateY(-12px)} }
-          `}</style>
-        </div>
-      )}
+      {/* Overlay */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(28,18,8,0.75) 0%, rgba(26,107,60,0.4) 50%, rgba(28,18,8,0.75) 100%)' }} />
 
-      {/* Overlay dégradé */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(135deg, rgba(28,18,8,0.82) 0%, rgba(26,107,60,0.45) 50%, rgba(28,18,8,0.82) 100%)',
-      }} />
-
-      {/* Bande tricolore haut */}
+      {/* Bandes tricolores */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(to right, #1A6B3C, #D4A017, #C0392B)' }} />
-      {/* Bande tricolore bas */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(to right, #C0392B, #D4A017, #1A6B3C)' }} />
 
-      {/* Contenu centré */}
-      <div className="reveal" style={{
-        position: 'relative', zIndex: 10,
-        height: '100%',
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        textAlign: 'center', padding: '0 1.5rem',
-      }}>
-        {/* Logo animé par-dessus */}
-        <img
-          src="/images/logo/pegasen-logo.png"
-          alt="PEGASEN221"
-          style={{
-            width: 'min(35vw, 160px)',
-            height: 'auto',
-            marginBottom: '1.5rem',
-            filter: 'drop-shadow(0 0 25px rgba(212,160,23,0.85))',
-            animation: 'float 5s ease-in-out infinite',
-          }}
-        />
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
-          <div style={{ height: '1px', width: '50px', background: 'linear-gradient(to right, transparent, #D4A017)' }} />
-          <span style={{ color: '#F0C040', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.3em', fontWeight: 600 }}>
-            L'esprit PEGASEN221
-          </span>
-          <div style={{ height: '1px', width: '50px', background: 'linear-gradient(to left, transparent, #D4A017)' }} />
+      {/* Contenu */}
+      <div style={{ position: 'relative', zIndex: 10, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '0 1.5rem' }}>
+        <img src="/images/logo/pegasen-logo.png" alt="PEGASEN221"
+          style={{ width: 'min(30vw, 140px)', height: 'auto', marginBottom: '1.25rem', filter: 'drop-shadow(0 0 20px rgba(212,160,23,0.85))', animation: 'float 5s ease-in-out infinite' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '0.85rem' }}>
+          <div style={{ height: '1px', width: '40px', background: 'linear-gradient(to right, transparent, #D4A017)' }} />
+          <span style={{ color: '#F0C040', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.3em', fontWeight: 600 }}>L'esprit PEGASEN221</span>
+          <div style={{ height: '1px', width: '40px', background: 'linear-gradient(to left, transparent, #D4A017)' }} />
         </div>
-
-        <h2 style={{
-          fontFamily: '"Playfair Display", serif',
-          fontSize: 'clamp(2rem, 5vw, 3.5rem)',
-          color: 'white', lineHeight: 1.1,
-          marginBottom: '1rem',
-          textShadow: '0 4px 30px rgba(0,0,0,0.5)',
-        }}>
-          Le Sénégal s'ouvre<br />
-          <span style={{ color: '#D4A017' }}>devant vous</span>
+        <h2 style={{ fontFamily: '"Playfair Display", serif', fontSize: 'clamp(1.6rem, 5vw, 3.2rem)', color: 'white', lineHeight: 1.1, marginBottom: '0.85rem', textShadow: '0 4px 30px rgba(0,0,0,0.5)' }}>
+          Le Sénégal s'ouvre<br /><span style={{ color: '#D4A017' }}>devant vous</span>
         </h2>
-
-        <p style={{
-          fontFamily: '"Cormorant Garamond", serif',
-          fontStyle: 'italic',
-          fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
-          color: 'rgba(255,255,255,0.82)',
-          maxWidth: '520px',
-          marginBottom: '2rem',
-          lineHeight: 1.6,
-        }}>
+        <p style={{ fontFamily: '"Cormorant Garamond", serif', fontStyle: 'italic', fontSize: 'clamp(1rem, 2.5vw, 1.3rem)', color: 'rgba(255,255,255,0.78)', maxWidth: '480px', marginBottom: '1.75rem', lineHeight: 1.6 }}>
           Comme le cheval ailé déploie ses ailes, laissez-vous porter vers des horizons nouveaux.
         </p>
-
         <a href="https://wa.me/+221788938254" target="_blank" rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex', alignItems: 'center', gap: '10px',
-            background: 'rgba(212,160,23,0.9)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(212,160,23,0.6)',
-            color: 'white', fontWeight: 700,
-            padding: '14px 32px', borderRadius: '9999px',
-            textDecoration: 'none', fontSize: '1rem',
-            transition: 'all 0.3s',
-            boxShadow: '0 4px 20px rgba(212,160,23,0.4)',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#D4A017'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(212,160,23,0.6)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(212,160,23,0.9)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(212,160,23,0.4)' }}>
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(212,160,23,0.88)', border: '1px solid rgba(212,160,23,0.6)', color: 'white', fontWeight: 700, padding: '13px 28px', borderRadius: '9999px', textDecoration: 'none', fontSize: '0.95rem', transition: 'all 0.3s', boxShadow: '0 4px 20px rgba(212,160,23,0.4)' }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#D4A017'; e.currentTarget.style.transform = 'translateY(-3px)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(212,160,23,0.88)'; e.currentTarget.style.transform = 'translateY(0)' }}>
           ✈️ Planifier mon voyage
         </a>
       </div>
+
+      <style>{`
+        @keyframes wingSway { 0%,100%{opacity:0.28;transform:translateY(-50%) translateX(10%) rotate(-5deg) scale(1)} 50%{opacity:0.38;transform:translateY(-50%) translateX(10%) rotate(-5deg) scale(1.05)} }
+        @keyframes haloBeat { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1} 50%{transform:translate(-50%,-50%) scale(1.15);opacity:0.6} }
+        video::-webkit-media-controls,video::-webkit-media-controls-enclosure,video::-webkit-media-controls-panel,video::-webkit-media-controls-play-button,video::-webkit-media-controls-start-playback-button,video::-webkit-media-controls-overlay-play-button{display:none!important}
+      `}</style>
     </section>
   )
 }
